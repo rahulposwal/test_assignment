@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:assignment_project/bloc/home_event.dart';
 import 'package:assignment_project/bloc/home_state.dart';
 import 'package:assignment_project/repository/home_repository.dart';
@@ -10,11 +8,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadUserEvent>(_onLoadUserEvent);
   }
 
-  _onLoadUserEvent(LoadUserEvent event, Emitter<HomeState> emit)async {
+  _onLoadUserEvent(LoadUserEvent event, Emitter<HomeState> emit) async {
     final UserRepository _userRepository = UserRepository();
     emit(DataLoadingState());
     try {
-      Map<String,dynamic> users = await _userRepository.getUsers();
+      Map<String, dynamic> users = await _userRepository.getUsers();
       emit(DataLoadedState(users));
     } catch (e) {
       emit(DataErrorState(e.toString()));

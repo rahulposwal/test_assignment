@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,55 +38,52 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             if (state is DataLoadingState) {
               count++;
-              return count == 1 ? const Center(
-                child: CircularProgressIndicator(),
-              ) : ListView.builder(
-                  itemCount: dialogList.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                      child: Card(
-                          color: Theme.of(context).primaryColor,
-                          child: ListTile(
-                            title: Text(
-                              '${dialogList[index]}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          )),
-                    );
-                  });
+              return count == 1
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : ListView.builder(
+                      itemCount: dialogList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 8),
+                          child: Card(
+                              color: Theme.of(context).primaryColor,
+                              child: ListTile(
+                                title: Text(
+                                  '${dialogList[index]}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              )),
+                        );
+                      });
             }
             if (state is DataLoadedState) {
-              Map<String,dynamic> userList = state.users;
-              if(prefs!.getBool("isLocalData")!)
-                {
+              //api success and load data into list
+              Map<String, dynamic> userList = state.users;
+              if (prefs!.getBool("isLocalData")!) {
+                dialogList.add(userList['joke']);
+              } else {
+                if (dialogList.length > 9) {
+                  dialogList.removeAt(0);
                   dialogList.add(userList['joke']);
+                  localDialogList.add(userList['joke']);
+                  prefs!.setStringList('dialogList', localDialogList);
+                } else {
+                  dialogList.add(userList['joke']);
+                  localDialogList.add(userList['joke']);
+                  prefs!.setStringList('dialogList', localDialogList);
                 }
-              else
-                {
-                  if(dialogList.length > 9)
-                  {
-                    dialogList.removeAt(0);
-                    dialogList.add(userList['joke']);
-                    localDialogList.add(userList['joke']);
-                    prefs!.setStringList('dialogList', localDialogList);
-                  }
-                  else
-                  {
-                    dialogList.add(userList['joke']);
-                    localDialogList.add(userList['joke']);
-                    prefs!.setStringList('dialogList', localDialogList);
-                  }
-                }
+              }
 
-
+              //list for display dialog data
               return ListView.builder(
                   itemCount: dialogList.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
                       child: Card(
                           color: Theme.of(context).primaryColor,
                           child: ListTile(
@@ -105,19 +103,17 @@ class _HomePageState extends State<HomePage> {
 
             return Container();
           },
-        )
-    );
+        ));
   }
 
-  void initPref() async{
+  void initPref() async {
     prefs = await SharedPreferences.getInstance();
     prefs!.setBool("isLocalData", false);
-    if(prefs!.getStringList('dialogList') != null)
-      {
-        count++;
-        prefs!.setBool("isLocalData", true);
-        dialogList = prefs!.getStringList('dialogList')!;
-        localDialogList = prefs!.getStringList('dialogList')!;
-      }
+    if (prefs!.getStringList('dialogList') != null) {
+      count++;
+      prefs!.setBool("isLocalData", true);
+      dialogList = prefs!.getStringList('dialogList')!;
+      localDialogList = prefs!.getStringList('dialogList')!;
+    }
   }
 }
